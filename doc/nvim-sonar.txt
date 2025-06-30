@@ -1,0 +1,47 @@
+*nvim-sonar*
+
+A Neovim plugin for SonarQube/SonarCloud integration and local SonarLint analysis.
+
+*Installation*
+
+(Coming soon)
+
+*Configuration*
+
+>lua
+require('nvim-sonar').setup({
+  mode = "local", -- "connected" or "local"
+  scan_mode = "on_demand", -- "live" or "on_demand"
+  sonarqube_url = "",
+  sonarqube_token = "",
+  sonarlint_cli_path = "", -- Path to your sonarlint-cli executable
+})
+<
+
+*Commands*
+
+*:SonarScan*:: Run Sonar scan on the current buffer.
+*:SonarTelescope*:: Open Telescope picker for Sonar issues.
+*:SonarRules*:: Open Telescope picker for Sonar rules (connected mode only).
+
+*Heirline Integration*
+
+To integrate with Heirline, you can add the following to your Heirline configuration:
+
+>lua
+require('heirline').setup({
+  -- ... other components
+  statusline = {
+    -- ... other components
+    require('nvim-sonar').get_heirline_component(),
+  },
+})
+<
+
+*WhichKey Integration*
+
+WhichKey mappings are automatically set up if WhichKey is installed and loaded.
+
+`,sS`:: Scan Current Buffer
+`,st`:: Telescope Issues
+`,sr`:: Sonar Rules
