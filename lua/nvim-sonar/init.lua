@@ -3,7 +3,13 @@ local M = {}
 local config = require("nvim-sonar.config")
 local local_scanner = require("nvim-sonar.local")
 local connected_scanner = require("nvim-sonar.connected")
-local telescope_picker = require("nvim-sonar.telescope")
+
+-- Check if telescope is available before requiring telescope functionality
+local has_telescope, telescope_picker = pcall(require, "nvim-sonar.telescope")
+if not has_telescope then
+  telescope_picker = nil
+end
+
 local heirline_components = require("nvim-sonar.heirline")
 
 local function scan_current_buffer()
@@ -24,14 +30,20 @@ local function setup_whichkey()
   end
 
   local wk = require("which-key")
-  wk.register({
+  local keymaps = {
     s = {
       name = "Sonar",
       S = { ":SonarScan<CR>", "[S]can Current Buffer" },
-      t = { ":SonarTelescope<CR>", "[T]elescope Issues" },
-      r = { ":SonarRules<CR>", "[R]ules" },
     },
-  }, { prefix = "," })
+  }
+  
+  -- Only add telescope keymaps if telescope is available
+  if telescope_picker then
+    keymaps.s.t = { ":SonarTelescope<CR>", "[T]elescope Issues" }
+    keymaps.s.r = { ":SonarRules<CR>", "[R]ules" }
+  end
+  
+  wk.register(keymaps, { prefix = "," })
 end
 
 function M.setup(opts)
@@ -47,8 +59,12 @@ function M.setup(opts)
 
   -- Expose commands
   vim.api.nvim_create_user_command("SonarScan", scan_current_buffer, { desc = "Run Sonar scan on current buffer" })
-  vim.api.nvim_create_user_command("SonarTelescope", telescope_picker.pick_sonar_issues, { desc = "Open Telescope picker for Sonar issues" })
-  vim.api.nvim_create_user_command("SonarRules", telescope_picker.pick_sonar_rules, { desc = "Open Telescope picker for Sonar rules" })
+  
+  -- Only create telescope commands if telescope is available
+  if telescope_picker then
+    vim.api.nvim_create_user_command("SonarTelescope", telescope_picker.pick_sonar_issues, { desc = "Open Telescope picker for Sonar issues" })
+    vim.api.nvim_create_user_command("SonarRules", telescope_picker.pick_sonar_rules, { desc = "Open Telescope picker for Sonar rules" })
+  end
 
   setup_whichkey()
 end

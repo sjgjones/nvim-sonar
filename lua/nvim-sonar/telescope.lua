@@ -1,6 +1,12 @@
 local M = {}
 
-local telescope = require("telescope")
+-- Check if telescope is available before requiring it
+local has_telescope, telescope = pcall(require, "telescope")
+if not has_telescope then
+  vim.notify("nvim-sonar: telescope.nvim is not installed. Telescope features will be disabled.", vim.log.levels.WARN)
+  return M
+end
+
 local finders = require("telescope.finders")
 local pickers = require("telescope.pickers")
 local conf = require("telescope.config").values
